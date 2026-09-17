@@ -1,0 +1,60 @@
+# Secret scan config for the pre-commit hook (.githooks/pre-commit).
+# Rule 5 of CLAUDE.md "Secrets — hard rules", on top of gitleaks' default rules.
+title = "secret-handling rules"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "aws-access-key-id"
+description = "AWS access key id (AKIA/ASIA)"
+regex = '''\b(?:AKIA|ASIA)[A-Z0-9]{16}\b'''
+keywords = ["akia", "asia"]
+
+[[rules]]
+id = "github-fine-grained-pat"
+description = "GitHub fine-grained personal access token"
+regex = '''github_pat_[A-Za-z0-9_]{22,}'''
+keywords = ["github_pat_"]
+
+[[rules]]
+id = "github-token"
+description = "GitHub classic/OAuth/app token (ghp_, gho_, ghu_, ghs_, ghr_)"
+regex = '''\bgh[pousr]_[A-Za-z0-9]{36,}'''
+keywords = ["ghp_", "gho_", "ghu_", "ghs_", "ghr_"]
+
+[[rules]]
+id = "supabase-secret-key"
+description = "Supabase secret API key (sb_secret_)"
+regex = '''sb_secret_[A-Za-z0-9_-]{16,}'''
+keywords = ["sb_secret_"]
+
+[[rules]]
+id = "supabase-service-role-jwt"
+description = "JWT whose payload carries role service_role (base64 of service_role at any alignment)"
+regex = '''eyJ[A-Za-z0-9_-]{5,}\.eyJ[A-Za-z0-9_-]*(?:c2VydmljZV9yb2|lcnZpY2Vfcm9s|ZXJ2aWNlX3Jvb)[A-Za-z0-9_-]*\.[A-Za-z0-9_-]{10,}'''
+keywords = ["eyj"]
+
+[[rules]]
+id = "google-oauth-client-secret"
+description = "Google OAuth client secret (GOCSPX-)"
+regex = '''GOCSPX-[A-Za-z0-9_-]{20,}'''
+keywords = ["gocspx-"]
+
+[[rules]]
+id = "private-key-block"
+description = "PEM private key"
+regex = '''-----BEGIN (?:[A-Z0-9]+ )*PRIVATE KEY-----'''
+keywords = ["private key"]
+
+[[rules]]
+id = "bitrix-webhook"
+description = "Bitrix24 inbound webhook URL (/rest/<id>/<token>/)"
+regex = '''/rest/\d+/[a-z0-9]{10,}/'''
+keywords = ["/rest/"]
+
+[[rules]]
+id = "s3-credential-assignment"
+description = "S3/R2/AWS access or secret key assigned a literal value"
+regex = '''(?i)\b(?:s3|r2|aws)_(?:secret_access_key|access_key_id|access_key|secret_key)\s*[:=]\s*['"]?[A-Za-z0-9/+]{16,}'''
+keywords = ["_key"]

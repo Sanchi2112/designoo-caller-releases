@@ -1,0 +1,11 @@
+# Secrets — never commit (CLAUDE.md "Secrets — hard rules")
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*service-account*.json
+*-[0-9a-f]*[0-9a-f].json
+creds.json
+auth_info/
+**/release/**/resources/.env

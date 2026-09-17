@@ -1,0 +1,29 @@
+#!/bin/sh
+# Secret scan on staged changes (gitleaks + .gitleaks.toml).
+# See CLAUDE.md "Secrets — hard rules". Enable once per clone:
+#   git config core.hooksPath .githooks
+if ! command -v gitleaks >/dev/null 2>&1; then
+  echo "" >&2
+  echo "####################################################################" >&2
+  echo "##  WARNING: gitleaks is NOT installed - secret scan was SKIPPED.  ##" >&2
+  echo "##  Install it (see CLAUDE.md) so secrets are blocked at commit.   ##" >&2
+  echo "####################################################################" >&2
+  echo "" >&2
+  exit 0
+fi
+
+root=$(git rev-parse --show-toplevel)
+cfg="$root/.gitleaks.toml"
+
+if gitleaks git --help >/dev/null 2>&1; then
+  gitleaks git --pre-commit --staged --redact --no-banner --config "$cfg" "$root"
+else
+  gitleaks protect --staged --redact --no-banner --config "$cfg" --source "$root"
+fi
+status=$?
+
+if [ "$status" -ne 0 ]; then
+  echo "gitleaks: possible secret in staged changes - commit blocked." >&2
+  echo "Unstage it and report it by name/location only (CLAUDE.md, Secrets rules 1-2, 9)." >&2
+fi
+exit "$status"
